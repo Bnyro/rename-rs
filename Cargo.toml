@@ -1,5 +1,7 @@
 [package]
-name = "rmv"
+name = "rn"
+description = "Command line tool to bulk rename files recursively. It's fast!"
+authors = ["Bnyro"]
 version = "0.1.0"
 edition = "2021"
 

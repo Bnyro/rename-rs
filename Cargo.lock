@@ -179,7 +179,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rmv"
+name = "rn"
 version = "0.1.0"
 dependencies = [
  "clap",
