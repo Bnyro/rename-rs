@@ -65,7 +65,9 @@ fn handle_file(path: &PathBuf) -> bool {
     }
 
     let new_file_name = new_name.unwrap().to_string();
-    let _ = rename(path, &new_file_name);
+    let mut target = path.to_owned();
+    target.set_file_name(&new_file_name);
+    let _ = rename(path, target);
 
     println!("Renamed {} to {}", file_name, new_file_name);
 
