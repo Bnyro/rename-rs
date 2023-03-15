@@ -4,6 +4,7 @@ use std::{
     fs::{self, metadata, rename},
     io,
     path::{Path, PathBuf},
+    time::Instant,
 };
 
 #[derive(Parser, Debug, Clone)]
@@ -24,6 +25,7 @@ lazy_static! {
 }
 
 fn main() {
+    let now = Instant::now();
     let mut count = 0;
 
     let paths = if ARGS.recursively {
@@ -44,7 +46,9 @@ fn main() {
         }
     }
 
-    println!(">>> Modified {} files", count);
+    let elapsed = now.elapsed();
+
+    println!(">>> Modified {} files in {:.2?} <<<", count, elapsed);
 }
 
 fn _list_files(vec: &mut Vec<PathBuf>, path: &Path) -> io::Result<()> {
