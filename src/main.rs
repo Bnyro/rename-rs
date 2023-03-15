@@ -1,10 +1,10 @@
 use clap::{command, ArgAction, Parser};
 use lazy_static::lazy_static;
 use std::{
-    fs::{self, rename},
-    path::PathBuf,
+    fs::{self, metadata, rename},
+    io,
+    path::{Path, PathBuf},
 };
-use walkdir::WalkDir;
 
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
@@ -26,30 +26,46 @@ lazy_static! {
 fn main() {
     let mut count = 0;
 
-    if ARGS.recursively {
-        for file in WalkDir::new(ARGS.directory.clone())
-            .into_iter()
-            .filter_map(|file| file.ok())
-        {
-            if file.path().is_file() && handle_file(&file.path().to_path_buf()) {
-                count += 1
-            }
-        }
+    let paths = if ARGS.recursively {
+        list_files(&PathBuf::from(&ARGS.directory.clone())).expect("Unable to read directory")
     } else {
-        let paths = fs::read_dir(ARGS.directory.clone()).unwrap();
-        for path in paths {
-            match path {
-                Ok(path) => {
-                    if path.path().is_file() && handle_file(&path.path()) {
-                        count += 1
-                    }
-                }
-                Err(_) => {}
-            }
+        fs::read_dir(ARGS.directory.clone())
+            .unwrap()
+            .filter_map(|path| path.ok())
+            .map(|path| path.path())
+            .collect()
+    };
+
+    let files = paths.iter().filter(|path| path.is_file());
+
+    for file in files {
+        if handle_file(&file) {
+            count += 1
         }
     }
 
     println!(">>> Modified {} files", count);
+}
+
+fn _list_files(vec: &mut Vec<PathBuf>, path: &Path) -> io::Result<()> {
+    if metadata(&path)?.is_dir() {
+        let paths = fs::read_dir(&path)?;
+        for path_result in paths {
+            let full_path = path_result?.path();
+            if metadata(&full_path)?.is_dir() {
+                _list_files(vec, &full_path)?
+            } else {
+                vec.push(full_path);
+            }
+        }
+    }
+    Ok(())
+}
+
+fn list_files(path: &Path) -> io::Result<Vec<PathBuf>> {
+    let mut vec = Vec::new();
+    _list_files(&mut vec, &path)?;
+    Ok(vec)
 }
 
 fn handle_file(path: &PathBuf) -> bool {
