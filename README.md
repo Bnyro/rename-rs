@@ -1,6 +1,15 @@
 # rename-rs
 Command line tool to bulk rename files recursively. It's fast!
 
+## Installation
+Download the latest release tarball from the [releases page](https://github.com/Bnyro/rename-rs/releases/latest).
+<br />
+Extract the binary by running `tar xvf rn-{release version and architecture}.tar.gz`.
+<br />
+Move the `rn` binary to any directory in your path variable, for example by running `mv rn /usr/local/bin/rn`.
+<br />
+Congrats! You're now ready to use it in production.
+
 ## Basic usage
 ```
 Usage: rmv [OPTIONS] <FROM> <TO>
